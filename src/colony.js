@@ -1,4 +1,4 @@
-import { BUILDINGS, BEDS, NAMES, randomLook, RUNNERS, RUNNER_ORDER } from './data.js';
+import { BUILDINGS, BEDS, NAMES, ROLES, randomLook, RUNNERS, RUNNER_ORDER } from './data.js';
 import { rng } from './maze.js';
 import { ensureGladeState, overnightGlade } from './glade.js';
 
@@ -29,6 +29,32 @@ export function newSave(settings) {
   };
   ensureGladeState(s);
   return s;
+}
+
+/**
+ * Bring any older save up to date instead of throwing it away: keep what the
+ * player earned and fill anything new with defaults.
+ */
+export function migrateSave(s) {
+  if (!s || typeof s !== 'object' || !s.seed) return null;
+  const base = newSave(s.settings);
+  const out = { ...base, ...s };
+  for (const k of ['res', 'stats', 'settings']) out[k] = { ...base[k], ...(s[k] ?? {}) };
+  for (const k of ['food', 'wood', 'metal']) out.res[k] = Math.max(0, Math.floor(Number(out.res[k]) || 0));
+  out.day = Math.max(1, Math.floor(Number(out.day) || 1));
+  if (!Array.isArray(out.gladers) || !out.gladers.length) out.gladers = base.gladers;
+  out.gladers = out.gladers.filter((g) => g && g.look).map((g) => ({ ...g, role: ROLES[g.role] ? g.role : 'idle' }));
+  out.nextName = Math.max(out.nextName ?? 0, ...out.gladers.map((g) => (g.n ?? 0) + 1));
+  if (!Array.isArray(out.unlocked)) out.unlocked = ['theo'];
+  out.unlocked = out.unlocked.filter((id) => RUNNERS[id]);
+  if (!out.unlocked.includes('theo')) out.unlocked.unshift('theo');
+  if (!out.unlocked.includes(out.runner)) out.runner = 'theo';
+  out.fragments = Math.min(FRAGMENTS_NEEDED, Math.max(0, Number(out.fragments) || 0));
+  ensureGladeState(out);
+  for (const [k, def] of Object.entries(BUILDINGS)) out.buildings[k] = Math.min(def.max, Math.max(def.start, Math.floor(Number(out.buildings[k]) || 0)));
+  for (const k of Object.keys(out.construction)) if (!BUILDINGS[k]) delete out.construction[k];
+  out.v = SAVE_VERSION;
+  return out;
 }
 
 export const gladerName = (g, lang) => NAMES[g.n % NAMES.length][lang === 'he' ? 1 : 0];

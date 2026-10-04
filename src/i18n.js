@@ -97,6 +97,7 @@ const STR = {
     lever: 'LEVER {n}/3', vaultOpen: 'THE VAULT IS OPEN!', vaultHint: 'A vault! Pull 3 levers in this sector to open it.',
     stranded: 'A LOST GLADER!', strandedHint: 'Bring them back to the Glade!', rescuedG: '{name} is safe in the Glade!',
     drop: 'SUPPLY DROP IN SECTOR {n}!', alpha: 'THE ALPHA GRINDER GUARDS THE CODE!',
+    welcomeBack: 'WELCOME BACK · DAY {n}',
     shiftWarn: 'The walls are moving!', built: '{name} is ready!', arrived: '{name} came up in the Box!',
   },
   he: {
@@ -190,6 +191,7 @@ const STR = {
     lever: 'ידית {n}/3', vaultOpen: 'הכספת נפתחה!', vaultHint: 'כספת! צריך למשוך 3 ידיות בסקטור הזה כדי לפתוח אותה.',
     stranded: 'גליידר אבוד!', strandedHint: 'להחזיר אותו לגלייד!', rescuedG: '{name} בטוח בגלייד!',
     drop: 'הצנחת אספקה בסקטור {n}!', alpha: 'גריינדר האלפא שומר על הקוד!',
+    welcomeBack: 'חזרנו! · יום {n}',
     shiftWarn: 'הקירות זזים!', built: '{name} מוכן!', arrived: '{name} עלה בקופסה!',
   },
 };

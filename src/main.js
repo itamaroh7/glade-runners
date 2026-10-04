@@ -21,7 +21,7 @@ import { Fx } from './fx.js';
 import { Council } from './council.js';
 import { Popup } from './popup.js';
 import { RUNNERS, CODE_WORDS, THEMES, SHRINES, BUILDINGS, ROLES, ROLE_ORDER, BEDS, plotsFor, GROW_TIME, randomLook } from './data.js';
-import { newSave, SAVE_VERSION, runnerMods, resolveDay, isFinalDay, checkUnlocks, gladerName, buildCost, canAfford, pay, setRole, rescues, lootMul, EAT_PER_HEAD } from './colony.js';
+import { newSave, migrateSave, runnerMods, resolveDay, isFinalDay, checkUnlocks, gladerName, buildCost, canAfford, pay, setRole, rescues, lootMul, EAT_PER_HEAD } from './colony.js';
 import { t, tn, apply as applyI18n, getLang, setLang } from './i18n.js';
 
 const $ = (s) => document.querySelector(s);
@@ -29,16 +29,27 @@ const $$ = (s) => document.querySelectorAll(s);
 const ICON = { food: '🍎', wood: '🪵', metal: '⚙️' };
 
 // ---------------- save ----------------
-const SAVE_KEY = 'gr.save.v3';
+// One stable key from now on; older keys are read once and migrated.
+const SAVE_KEY = 'gr.save';
+const OLD_SAVE_KEYS = ['gr.save.v3', 'gr.save.v2', 'gr.save.v1'];
 function loadSave() {
   try {
-    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (s && s.v === SAVE_VERSION) { ensureGladeState(s); return s; }
+    for (const key of [SAVE_KEY, ...OLD_SAVE_KEYS]) {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const s = migrateSave(JSON.parse(raw));
+      if (s) return s;
+    }
   } catch {}
   return newSave();
 }
 let save = loadSave();
-const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
+const persist = () => {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    for (const k of OLD_SAVE_KEYS) localStorage.removeItem(k);
+  } catch {}
+};
 
 // ---------------- renderer ----------------
 const isMobile = matchMedia('(pointer: coarse)').matches;
@@ -1324,9 +1335,96 @@ function applySettings() {
   music.setEnabled(save.settings.music);
 }
 
+// ---------------- mid-day autosave ----------------
+const bits = (arr, f) => arr.map((x) => (f(x) ? '1' : '0')).join('');
+
+/** Everything needed to drop the player back into today's maze. */
+function snapshot() {
+  if (phase !== 'day' || player.dead || !world) return save.midday ?? null;
+  return {
+    day: save.day,
+    t: dayTime,
+    doorStart: flags.doorStart ?? null,
+    p: [player.pos.x, player.pos.z],
+    hp: player.hp / player.maxHp,
+    dayRes: { ...dayRes },
+    made: { ...made },
+    crates: bits(crates.items, (c) => !c.alive),
+    cracks: bits(maze.cracks, (c) => !c.alive),
+    frag: !!world.fragment?.taken,
+    levers: bits(world.levers, (l) => l.pulled),
+    looted: !!world.vault?.looted,
+    shrines: bits(world.shrines, (s) => s.used),
+    stranded: stranded ? (stranded.done ? 'done' : stranded.following ? 'follow' : 'wait') : null,
+    drop: drop ? { state: drop.state, at: drop.at, x: drop.x, z: drop.z } : null,
+    alphaDead: !!alpha && !alpha.alive,
+    rescues: rescuesLeft,
+    hints: [!!flags.h1, !!flags.h2, !!flags.vaultHint],
+  };
+}
+
+let autosaveT = 0;
+function autosave() {
+  if (!world || !['play', 'pause', 'map', 'council'].includes(state)) return;
+  save.midday = snapshot();
+  persist();
+}
+
+function restoreSnapshot(m) {
+  dayTime = m.t;
+  flags.doorStart = m.doorStart;
+  if (m.doorStart != null) flags.open = true;
+  flags.warn = dayTime >= DAY.length - DAY.closeDur - DAY.warnLeft;
+  [flags.h1, flags.h2, flags.vaultHint] = m.hints ?? [true, true, true];
+  player.pos.set(m.p[0], 0, m.p[1]);
+  world.collide(player.pos, player.r);
+  player.hp = Math.max(1, player.maxHp * (m.hp ?? 1));
+  dayRes = { ...dayRes, ...m.dayRes };
+  made = { ...made, ...m.made };
+  rescuesLeft = m.rescues ?? rescuesLeft;
+  crates.items.forEach((c, i) => { if (m.crates?.[i] === '1') { c.alive = false; c.collider.alive = false; crates.writeMatrix(c); } });
+  maze.cracks.forEach((c, i) => { if (m.cracks?.[i] === '1') world.damageCrack(c, 1e9); });
+  if (m.frag) world.takeFragment();
+  world.levers.forEach((l, i) => { if (m.levers?.[i] === '1') world.pullLever(l); });
+  if (world.levers.length && world.levers.every((l) => l.pulled)) world.openGate();
+  if (m.looted && world.vault) world.vault.looted = true;
+  world.shrines.forEach((s, i) => { if (m.shrines?.[i] === '1') world.useShrine(s); });
+  if (stranded && m.stranded !== 'wait') {
+    if (m.stranded === 'follow') {
+      stranded.following = true;
+      stranded.npc.follower = true;
+      stranded.npc.pos.set(player.pos.x + 1.2, 0, player.pos.z);
+    } else { stranded.npc.dispose(); stranded = null; }
+  }
+  if (m.drop && drop) {
+    if (m.drop.state === 'pending') drop.at = m.drop.at;
+    else if (m.drop.state === 'done' || m.drop.state === 'falling' && !m.drop.x) drop.state = 'done';
+    else {
+      drop = { state: 'landed', x: m.drop.x, z: m.drop.z, t: 3, mesh: buildDropMesh() };
+      drop.mesh.position.set(drop.x, 0, drop.z);
+      drop.mesh.getObjectByName('chute').visible = false;
+      scene.add(drop.mesh);
+    }
+  }
+  if (m.alphaDead && alpha) { alpha.alive = false; alpha.dispose(); }
+  applyDaylight(Math.min(1, dayTime / DAY.length));
+  cam.look.copy(player.pos);
+  cam.pos.copy(player.pos).add(offset);
+  refreshRes();
+}
+
 function toMorning() {
+  const resume = save.midday && save.midday.day === save.day ? save.midday : null;
   prepareDay();
   setState('play');
+  if (resume) {
+    restoreSnapshot(resume);
+    showBanner(t('welcomeBack', { n: save.day }));
+    sfx.fanfare();
+    music.setMood(world.inGlade(player.pos.x, player.pos.z) ? 'glade' : 'maze');
+    return;
+  }
+  delete save.midday;
   showBanner(isFinalDay(save) ? t('finalMorning') : t('morningBanner', { n: save.day }));
   sfx.fanfare();
   music.setMood('glade');
@@ -1373,9 +1471,11 @@ function endDay(outcome) {
   }
   if (outcome === 'night') { setNight(false); applyDaylight(0.02); }
   $('#btn-end').textContent = t('cont');
+  // Settle the day right away so closing the game on this screen loses nothing.
+  const lines = [...takenLines, ...resolveDay(save, dayRes, outcome, made)];
+  delete save.midday;
+  persist();
   resultNext = () => {
-    const lines = [...takenLines, ...resolveDay(save, dayRes, outcome, made)];
-    persist();
     setState('council');
     council.open('evening', lines);
   };
@@ -1450,7 +1550,8 @@ $('#btn-new').addEventListener('click', () => {
 $('#btn-intro-go').addEventListener('click', () => { sfx.click(); save.seenIntro = true; persist(); toMorning(); });
 $('#btn-pause').addEventListener('click', () => { sfx.init(); sfx.click(); if (state === 'play') setState('pause'); });
 $('#btn-resume').addEventListener('click', () => { sfx.click(); setState('play'); });
-$('#btn-menu').addEventListener('click', () => { sfx.click(); prepareDay(); refreshMenu(); setState('menu'); music.setMood('menu'); });
+window.addEventListener('pagehide', () => autosave());
+$('#btn-menu').addEventListener('click', () => { sfx.click(); autosave(); prepareDay(); refreshMenu(); setState('menu'); music.setMood('menu'); });
 $('#btn-p-gladers').addEventListener('click', () => openRoster('gladers'));
 $('#btn-p-runner').addEventListener('click', () => openRoster('runner'));
 $('#btn-end').addEventListener('click', () => { sfx.click(); const fn = resultNext; resultNext = null; fn?.(); });
@@ -1484,6 +1585,7 @@ input.onKey = (code) => {
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    autosave();
     if (state === 'play') setState('pause');
     sfx.ctx?.suspend();
   } else if (sfx.ctx && state !== 'menu') sfx.ctx.resume();
@@ -1525,7 +1627,11 @@ function frame() {
 }
 
 function tick(dt) {
-  if (state === 'play') updatePlay(dt);
+  if (state === 'play') {
+    updatePlay(dt);
+    autosaveT += dt;
+    if (autosaveT > 5) { autosaveT = 0; autosave(); }
+  }
   const live = state === 'play' || state === 'menu' || state === 'council' || state === 'result';
   if (live) {
     const shiftWarn = world.update(dt);
