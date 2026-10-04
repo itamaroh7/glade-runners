@@ -27,7 +27,7 @@ export class Combat {
   chargeSuper(amount) {
     const p = this.p;
     if (p.superCharge >= 1) return;
-    p.superCharge = Math.min(1, p.superCharge + amount / p.def.superCost);
+    p.superCharge = Math.min(1, p.superCharge + (amount * (p.mods.superMul ?? 1)) / p.def.superCost);
     if (p.superCharge >= 1) this.G.onSuperReady();
   }
 
@@ -137,6 +137,7 @@ export class Combat {
       da = Math.atan2(Math.sin(da), Math.cos(da));
       if (Math.abs(da) <= arc / 2) { this.damageCrate(c, dmg); hitAny = true; }
     }
+    if (G.hitStatic?.(p.pos.x + dir.x * range * 0.6, p.pos.z + dir.z * range * 0.6, range * 0.7, dmg)) hitAny = true;
     this.arcVfx(face, range, arc, p.def.weapon === 'club' ? 0xffd27a : 0xffffff);
     if (hitAny) G.shake(0.2);
   }
@@ -230,6 +231,7 @@ export class Combat {
     for (const c of G.crates.items) {
       if (c.alive && Math.hypot(c.x - p.pos.x, c.z - p.pos.z) < radius + 0.6) this.damageCrate(c, dmg);
     }
+    G.hitStatic?.(p.pos.x, p.pos.z, radius, dmg);
     this.ringVfx(p.pos.x, p.pos.z, radius, color, 0.35);
   }
 

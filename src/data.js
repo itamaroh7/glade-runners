@@ -52,26 +52,87 @@ export const RUNNER_ORDER = ['theo', 'minjae', 'nate', 'garrick', 'tessa'];
 export const ROLES = {
   farmer: { icon: '🌾' },
   woodcutter: { icon: '🪓' },
-  smith: { icon: '🔨', needs: 'forge' },
+  builder: { icon: '🔨' },
+  smith: { icon: '⚒️', needs: 'forge' },
   medic: { icon: '✚' },
   guard: { icon: '🛡️' },
 };
-export const ROLE_ORDER = ['farmer', 'woodcutter', 'smith', 'medic', 'guard'];
+export const ROLE_ORDER = ['farmer', 'woodcutter', 'builder', 'smith', 'medic', 'guard'];
 
+// Every building has a fixed spot in the Glade. Level 0 = an empty building site.
 export const BUILDINGS = {
-  fields: { icon: '🌱', max: 4, cost: { 3: { wood: 20 }, 4: { wood: 34, metal: 8 } } },
-  homestead: { icon: '🏠', max: 3, cost: { 2: { wood: 24, metal: 5 }, 3: { wood: 42, metal: 14 } } },
-  tower: { icon: '🗼', max: 2, cost: { 1: { wood: 18, metal: 6 }, 2: { wood: 32, metal: 16 } } },
-  forge: { icon: '⚒️', max: 3, cost: { 1: { wood: 14, metal: 8 }, 2: { wood: 26, metal: 18 }, 3: { wood: 40, metal: 30 } } },
+  homestead: { icon: '🏠', max: 3, start: 1, cost: { 2: { wood: 30, metal: 6 }, 3: { wood: 55, metal: 18 } }, work: 1.4 },
+  fields: { icon: '🌱', max: 5, start: 1, cost: { 2: { wood: 10 }, 3: { wood: 18 }, 4: { wood: 28, metal: 4 }, 5: { wood: 40, metal: 10 } }, work: 0.5 },
+  tower: { icon: '🗼', max: 2, start: 0, cost: { 1: { wood: 20, metal: 6 }, 2: { wood: 36, metal: 16 } }, work: 1 },
+  forge: { icon: '⚒️', max: 3, start: 0, cost: { 1: { wood: 16, metal: 10 }, 2: { wood: 30, metal: 20 }, 3: { wood: 45, metal: 34 } }, work: 1.1 },
+  kitchen: { icon: '🍲', max: 2, start: 0, cost: { 1: { wood: 18, metal: 4 }, 2: { wood: 32, metal: 12 } }, work: 0.9 },
+  infirmary: { icon: '✚', max: 2, start: 0, cost: { 1: { wood: 16, metal: 8 }, 2: { wood: 30, metal: 18 } }, work: 0.9 },
+  workshop: { icon: '🧰', max: 2, start: 0, cost: { 1: { wood: 20, metal: 10 }, 2: { wood: 34, metal: 22 } }, work: 1 },
+  pen: { icon: '🐔', max: 2, start: 0, cost: { 1: { wood: 22, metal: 4 }, 2: { wood: 36, metal: 10 } }, work: 0.9 },
 };
-export const BUILD_ORDER = ['fields', 'homestead', 'tower', 'forge'];
+export const BUILD_ORDER = ['homestead', 'fields', 'tower', 'forge', 'kitchen', 'infirmary', 'workshop', 'pen'];
 export const BEDS = [0, 8, 12, 16];
+export const plotsFor = (fieldsLvl) => 2 + fieldsLvl * 2;
+
+export const GROW_TIME = 110; // seconds for a crop to ripen
+export const CHOP_REGROW = 90;
+
+// Maze sectors. The order is shuffled per save, so each save has its own map of sectors.
+export const THEMES = [
+  {
+    id: 'ivy', name: { en: 'Ivy Halls', he: 'אולמות הקיסוס' },
+    floor: [0x8f9c80, 0x86947a], wall: { bottom: 0x3f4a3c, top: 0x7f8f78, rim: 0x3f7a35, cap: 0x6db24f }, map: [196, 214, 176],
+    ivy: 0.75, bush: 0.2, crack: 0.02, spikes: 0, vents: 0, water: 0, shift: 0.05,
+  },
+  {
+    id: 'ruins', name: { en: 'The Ruins', he: 'החורבות' },
+    floor: [0xb8a487, 0xae9a7e], wall: { bottom: 0x6e5a44, top: 0xc9b08c, rim: 0x8a7354, cap: 0xd8c29c }, map: [226, 208, 176],
+    ivy: 0.12, bush: 0.03, crack: 0.3, spikes: 0, vents: 0, water: 0, shift: 0.04, rubble: true,
+  },
+  {
+    id: 'glow', name: { en: 'Glowshade', he: 'צל זוהר' },
+    floor: [0x4a4766, 0x45425f], wall: { bottom: 0x24203a, top: 0x4e4878, rim: 0x2f2a50, cap: 0x5a4e8f }, map: [150, 140, 196],
+    ivy: 0.1, bush: 0.04, crack: 0.03, spikes: 0, vents: 0, water: 0, shift: 0.05, dark: true, shrooms: true,
+  },
+  {
+    id: 'flood', name: { en: 'Floodways', he: 'תעלות ההצפה' },
+    floor: [0x7f97a0, 0x77909a], wall: { bottom: 0x3a4a55, top: 0x7f9aa8, rim: 0x3d6a7a, cap: 0x5aa0b0 }, map: [170, 206, 220],
+    ivy: 0.3, bush: 0.06, crack: 0.02, spikes: 0, vents: 0, water: 0.32, shift: 0.05,
+  },
+  {
+    id: 'spikes', name: { en: 'Spike Rows', he: 'שורות הדוקרנים' },
+    floor: [0x9a8478, 0x917c70], wall: { bottom: 0x4f3530, top: 0x9a6a58, rim: 0x6a3a30, cap: 0xa8584a }, map: [222, 182, 170],
+    ivy: 0.1, bush: 0.02, crack: 0.04, spikes: 0.13, vents: 0, water: 0, shift: 0.05,
+  },
+  {
+    id: 'machine', name: { en: 'Machine Yard', he: 'חצר המכונות' },
+    floor: [0x8a909c, 0x828894], wall: { bottom: 0x3a3f4a, top: 0x8a94a6, rim: 0x4a5262, cap: 0x9aa6b8 }, map: [190, 198, 214],
+    ivy: 0.05, bush: 0, crack: 0.04, spikes: 0, vents: 0.07, water: 0, shift: 0.08, pipes: true, metal: 0.6,
+  },
+  {
+    id: 'bones', name: { en: 'Bone Garden', he: 'גן העצמות' },
+    floor: [0xa49a8a, 0x9a9080], wall: { bottom: 0x5a5248, top: 0xcfc6b2, rim: 0x8a8070, cap: 0xe6dcc6 }, map: [226, 218, 200],
+    ivy: 0.08, bush: 0.03, crack: 0.05, spikes: 0.03, vents: 0, water: 0, shift: 0.05, bones: true, danger: 1.5, loot: 1.6,
+  },
+  {
+    id: 'shift', name: { en: 'Shifting Halls', he: 'האולמות הזזים' },
+    floor: [0x9a97a8, 0x8f8c9f], wall: { bottom: 0x4a4561, top: 0x9b94ad, rim: 0x4d7f3c, cap: 0x74b257 }, map: [214, 208, 226],
+    ivy: 0.3, bush: 0.05, crack: 0.03, spikes: 0, vents: 0, water: 0, shift: 0.32,
+  },
+];
+
+export const SHRINES = {
+  swift: { color: 0x6fd6ff, icon: '💨', secs: 40 },
+  fury: { color: 0xff6b4a, icon: '🔥', secs: 40 },
+  regen: { color: 0x7dff8a, icon: '💚', secs: 40 },
+};
 
 export const NAMES = [
   ['Alden', 'אלדן'], ['Skillet', 'סקילט'], ['Chip', 'צ׳יפ'], ['Wendell', 'וונדל'], ['Zeke', 'זיק'],
   ['Clay', 'קליי'], ['Jett', 'ג׳ט'], ['Bram', 'בראם'], ['Rowan', 'רואן'], ['Finch', 'פינץ׳'],
   ['Milo', 'מיילו'], ['Gus', 'גאס'], ['Ollie', 'אולי'], ['Pike', 'פייק'], ['Rudy', 'רודי'],
   ['Sawyer', 'סוייר'], ['Tobin', 'טובין'], ['Wade', 'וייד'], ['Kit', 'קיט'], ['Lenny', 'לני'],
+  ['Hank', 'הנק'], ['Nico', 'ניקו'], ['Otis', 'אוטיס'], ['Reed', 'ריד'], ['Sid', 'סיד'],
 ];
 
 export const CODE_WORDS = [
@@ -90,11 +151,18 @@ export function randomLook(R) {
 }
 
 // Enemy balance; scales with day.
-export function grinderStats(day, night = false) {
+export const ENEMY_TYPES = {
+  grinder: { hp: 1, dmg: 1, speed: 1, scale: 1, r: 0.9, wind: 0.55 },
+  crawler: { hp: 0.24, dmg: 0.32, speed: 1.3, scale: 0.55, r: 0.55, wind: 0.28 },
+  spitter: { hp: 0.7, dmg: 0.65, speed: 0.85, scale: 0.95, r: 0.85, wind: 0.6 },
+  alpha: { hp: 3.4, dmg: 1.3, speed: 0.92, scale: 1.55, r: 1.35, wind: 0.6 },
+};
+export function grinderStats(day, night = false, type = 'grinder') {
+  const T = ENEMY_TYPES[type];
   return {
-    hp: 2600 + day * 320,
-    dmg: 850 + day * 40,
-    speed: night ? 6.9 : 5.9,
-    patrol: 2.8,
+    hp: Math.round((2600 + day * 320) * T.hp / 10) * 10,
+    dmg: Math.round((850 + day * 40) * T.dmg / 10) * 10,
+    speed: (night ? 6.9 : 5.9) * T.speed,
+    patrol: 2.8 * Math.min(1.3, T.speed),
   };
 }

@@ -170,3 +170,43 @@ body:not(.touch) #btn-super { right: calc(20px + var(--safe-r)); bottom: calc(20
   .card2 { padding: 5px 8px; }
   .rline { padding: 4px 10px; font-size: 15px; }
 }
+
+/* ---------- in-world popup ---------- */
+#popup {
+  position: absolute; left: 0; top: 0; z-index: 15;
+  width: min(300px, 78vw);
+  background: linear-gradient(180deg, #4a3d7a, #2e2452);
+  border: 4px solid var(--ink); border-radius: 18px;
+  box-shadow: 0 6px 0 var(--ink);
+  padding: 10px 12px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  will-change: transform;
+}
+#popup.pop { animation: pp 0.25s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes pp { from { opacity: 0; margin-top: 14px; } }
+#popup::after { content: ''; position: absolute; left: 50%; bottom: -14px; margin-left: -10px; border: 10px solid transparent; border-top: 10px solid var(--ink); }
+.pp-x { position: absolute; top: -12px; inset-inline-end: -12px; width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--ink); background: #e0393e; color: #fff; font: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 0; }
+.pp-head { display: flex; align-items: center; gap: 8px; font-size: 20px; }
+.pp-head b { font-weight: 400; -webkit-text-stroke-width: 4px; flex: 1; }
+.pp-icon { font-size: 24px; }
+.pp-lv { font-size: 12px; background: rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 2px 8px; font-family: system-ui, sans-serif; font-weight: 800; }
+.pp-desc { font-family: system-ui, sans-serif; font-weight: 600; font-size: 13px; color: #e9e4ff; line-height: 1.35; }
+.pp-info { font-family: system-ui, sans-serif; font-weight: 700; font-size: 12.5px; color: #b6f0a0; }
+.pp-prog { height: 14px; border: 3px solid var(--ink); border-radius: 8px; background: #2a2148; overflow: hidden; }
+.pp-prog i { display: block; height: 100%; background: linear-gradient(90deg, #ffd23f, #7fdc5a); transform-origin: left; }
+.pp-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.pp-btns .btn { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 12px 9px; font-size: 16px; }
+.pp-btns .btn:disabled { filter: grayscale(0.8) brightness(0.8); }
+.pp-btns .btn.role { flex: 0 0 auto; padding: 5px 8px 7px; font-size: 18px; }
+.pp-btns .btn.role.on { box-shadow: 0 0 0 3px #fff, 0 4px 0 var(--ink); }
+.pcost { display: inline-flex; gap: 4px; -webkit-text-stroke-width: 3px; font-size: 13px; }
+.pc.short { color: #ff8a7a; }
+.dmg.gain { color: #ffe66b; font-size: 18px; }
+#buffs { display: flex; gap: 6px; }
+.buff { display: inline-flex; align-items: center; gap: 3px; background: rgba(24, 18, 40, 0.72); border: 3px solid var(--ink); border-radius: 10px; padding: 0 7px; font-size: 14px; }
+@media (max-height: 430px) {
+  #popup { padding: 7px 9px 9px; gap: 4px; }
+  .pp-head { font-size: 17px; }
+  .pp-desc { font-size: 12px; }
+  .pp-btns .btn { padding: 5px 10px 7px; font-size: 14px; }
+}

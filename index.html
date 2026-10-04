@@ -26,6 +26,7 @@
         <div id="day-label" class="ink"></div>
         <div id="clock-bar"><div id="clock-fill"></div><div id="clock-sun"></div></div>
         <div id="objective" class="ink"></div>
+        <div id="buffs"></div>
       </div>
       <div id="res">
         <div class="res" data-r="food"><span class="ico">🍎</span><span class="n ink">0</span></div>
@@ -46,6 +47,7 @@
 
     <div id="stick-move" class="stick"><div class="ring"></div><div class="knob"></div></div>
     <div id="stick-attack" class="stick attack"><div class="ring"></div><div class="knob"><svg viewBox="0 0 24 24"><path d="M4 20 L16 8 M12 4 L20 4 L20 12" /></svg></div></div>
+    <div id="popup" class="ui-block hidden"></div>
     <button id="btn-super" aria-label="Super"><span class="charge"></span><span class="bolt">⚡</span><span class="key">SPACE</span></button>
   </div>
 
@@ -82,7 +84,6 @@
       </div>
       <div class="tabs">
         <button class="tab" data-tab="gladers" data-i18n="tabGladers"></button>
-        <button class="tab" data-tab="build" data-i18n="tabBuild"></button>
         <button class="tab" data-tab="runner" data-i18n="tabRunner"></button>
       </div>
       <div id="c-body" class="panel-body"></div>
@@ -99,6 +100,10 @@
       <p class="ctrl-text touch-only" data-i18n="ctrlTouch"></p>
       <p class="ctrl-text mouse-only" data-i18n="ctrlDesk"></p>
       <button id="btn-resume" class="btn" data-i18n="resume"></button>
+      <div class="row">
+        <button id="btn-p-gladers" class="btn small" data-i18n="btnGladers"></button>
+        <button id="btn-p-runner" class="btn small" data-i18n="btnRunner"></button>
+      </div>
       <div class="row">
         <button id="btn-music" class="btn small blue toggle"></button>
         <button id="btn-sound" class="btn small blue toggle"></button>

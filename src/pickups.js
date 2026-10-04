@@ -31,14 +31,15 @@ export class Pickups {
     buildModels();
   }
 
-  spawn(type, x, z, n) {
+  /** opts.safe: goes straight to the Glade's stock (not lost if you fall). */
+  spawn(type, x, z, n, opts = {}) {
     for (let i = 0; i < n; i++) {
       const [geo, mat] = models[type];
       const mesh = part(geo, mat, null, { thick: 0.03 });
       this.scene.add(mesh);
       const a = Math.random() * Math.PI * 2;
       const sp = 2 + Math.random() * 2.5;
-      this.items.push({ type, mesh, x, z, y: 0.8, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: 6 + Math.random() * 2, t: 0, state: 'pop' });
+      this.items.push({ type, mesh, x, z, y: opts.y ?? 0.8, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: 6 + Math.random() * 2, t: 0, state: 'pop', safe: !!opts.safe });
     }
   }
 

@@ -52,7 +52,7 @@ export class Input {
     if (!this.enabled) return;
     if (e.target.closest?.('button, .ui-block')) return;
     if (e.pointerType === 'mouse') {
-      if (e.button === 0) { this.mouse.down = true; this.fire = { auto: false, mouse: true }; }
+      if (e.button === 0) { this.mouse.down = true; this.fire = { auto: false, mouse: true }; this.tap = { x: e.clientX, y: e.clientY, mouse: true }; }
       else if (e.button === 2) this.superQ = true;
       return;
     }
@@ -62,6 +62,7 @@ export class Input {
       if (this.mv.id !== null) return;
       const s = this.mv;
       s.id = e.pointerId;
+      s.t0 = performance.now(); s.sx = e.clientX; s.sy = e.clientY;
       s.bx = Math.max(RADIUS + 16, e.clientX);
       s.by = Math.min(window.innerHeight - RADIUS - 16, Math.max(RADIUS + 16, e.clientY));
       s.x = e.clientX; s.y = e.clientY;
@@ -78,6 +79,7 @@ export class Input {
       s.bx = near ? c.x : e.clientX;
       s.by = near ? c.y : e.clientY;
       s.x = e.clientX; s.y = e.clientY;
+      s.t0 = performance.now(); s.sx = e.clientX; s.sy = e.clientY; s.near = near;
       s.moved = false;
       s.el.classList.add('active');
       this.updateStick(s);
@@ -97,7 +99,9 @@ export class Input {
 
   up(e, cancel = false) {
     if (e.pointerType === 'mouse') { this.mouse.down = false; return; }
+    const short = (s) => performance.now() - s.t0 < 320 && Math.hypot(s.x - s.sx, s.y - s.sy) < 16;
     if (this.mv.id === e.pointerId) {
+      if (!cancel && this.enabled && short(this.mv)) this.tap = { x: this.mv.sx, y: this.mv.sy };
       this.mv.id = null;
       this.mv.el.classList.remove('active');
       this.mv.el.style.left = this.mv.el.style.top = '';
@@ -111,6 +115,7 @@ export class Input {
       s.knob.style.transform = '';
       if (!cancel && this.enabled) {
         if (this.aim.active) this.fire = { auto: false, x: this.aim.x, z: this.aim.z };
+        else if (!s.near && short(s)) this.tap = { x: s.sx, y: s.sy, fallbackFire: true };
         else this.fire = { auto: true };
       }
       this.aim.active = false;
@@ -139,6 +144,7 @@ export class Input {
     this.aim.active = false;
     this.fire = null;
     this.superQ = false;
+    this.tap = null;
     this.mouse.down = false;
     for (const s of [this.mv, this.at]) {
       s.id = null;
@@ -162,4 +168,5 @@ export class Input {
 
   takeFire() { const f = this.fire; this.fire = null; return f; }
   takeSuper() { const s = this.superQ; this.superQ = false; return s; }
+  takeTap() { const t = this.tap; this.tap = null; return t; }
 }

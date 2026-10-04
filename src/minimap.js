@@ -1,4 +1,5 @@
 import { GRID, T, worldToTile } from './config.js';
+import { THEMES } from './data.js';
 
 const COLORS = {
   [T.FLOOR]: [222, 214, 196],
@@ -6,6 +7,9 @@ const COLORS = {
   [T.RING]: [92, 74, 64],
   [T.DOOR]: [255, 192, 74],
   [T.GLADE]: [124, 201, 90],
+  [T.SHIFT]: [190, 150, 60],
+  [T.CRACK]: [150, 110, 80],
+  [T.GATE]: [242, 193, 78],
 };
 
 export class Minimap {
@@ -22,8 +26,9 @@ export class Minimap {
     this.dirty = true;
   }
 
-  reset(maze) {
+  reset(maze, world) {
     this.maze = maze;
+    this.world = world;
     this.explored.fill(0);
     this.img.data.fill(0);
     this.count = 0;
@@ -36,10 +41,33 @@ export class Minimap {
     this.dirty = true;
   }
 
+  colorOf(i) {
+    const t = this.maze.grid[i];
+    if (t === T.FLOOR) {
+      if (this.world?.flags[i] & 1) return [120, 190, 230];
+      if (this.world?.flags[i] & 4) return [210, 120, 110];
+      const s = this.world?.sector[i];
+      if (s !== undefined && s !== 255) return THEMES[this.maze.order[s]].map;
+    }
+    return COLORS[t] ?? COLORS[T.WALL];
+  }
+
+  /** Re-paint tiles that changed type (broken walls, opened gates). */
+  updateTiles(tiles) {
+    for (const [x, z] of tiles) {
+      const i = z * GRID + x;
+      if (!this.explored[i]) continue;
+      const c = this.colorOf(i);
+      const d = this.img.data;
+      d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2];
+    }
+    this.dirty = true;
+  }
+
   mark(i) {
     if (this.explored[i]) return false;
     this.explored[i] = 1;
-    const c = COLORS[this.maze.grid[i]];
+    const c = this.colorOf(i);
     const d = this.img.data;
     d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
     if (this.maze.grid[i] === T.FLOOR) this.count++;
