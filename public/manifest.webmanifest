@@ -1,0 +1,16 @@
+{
+  "name": "Glade Runners",
+  "short_name": "Glade Runners",
+  "description": "Run the maze. Map it. Make it back before the doors close.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1b1430",
+  "theme_color": "#1b1430",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

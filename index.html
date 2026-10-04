@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1b1430" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Glade Runners" />
+  <meta name="description" content="Run the maze. Map it. Make it back before the doors close. A fan-made mobile action game." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>Glade Runners</title>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="vignette"></div>
+  <div id="fx"></div>
+
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div id="minimap-wrap" class="ui-block"><canvas id="minimap"></canvas></div>
+      <div id="clock">
+        <div id="day-label" class="ink"></div>
+        <div id="clock-bar"><div id="clock-fill"></div><div id="clock-sun"></div></div>
+        <div id="objective" class="ink"></div>
+      </div>
+      <div id="res">
+        <div class="res" data-r="food"><span class="ico">🍎</span><span class="n ink">0</span></div>
+        <div class="res" data-r="wood"><span class="ico">🪵</span><span class="n ink">0</span></div>
+        <div class="res" data-r="metal"><span class="ico">⚙️</span><span class="n ink">0</span></div>
+      </div>
+      <button id="btn-pause" class="icon-btn" aria-label="Pause"><span></span><span></span></button>
+    </div>
+
+    <div id="pbar">
+      <div class="pname ink"></div>
+      <div class="hp"><div class="hp-fill"></div><span class="hp-text ink"></span></div>
+      <div class="ammo"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+    </div>
+
+    <div id="banner" class="ink"></div>
+    <div id="hint" class="ink"></div>
+
+    <div id="stick-move" class="stick"><div class="ring"></div><div class="knob"></div></div>
+    <div id="stick-attack" class="stick attack"><div class="ring"></div><div class="knob"><svg viewBox="0 0 24 24"><path d="M4 20 L16 8 M12 4 L20 4 L20 12" /></svg></div></div>
+    <button id="btn-super" aria-label="Super"><span class="charge"></span><span class="bolt">⚡</span><span class="key">SPACE</span></button>
+  </div>
+
+  <div id="screen-menu" class="screen">
+    <div class="title-wrap">
+      <div class="title"><span data-i18n="title1"></span><span data-i18n="title2"></span></div>
+      <div class="tagline ink" data-i18n="tagline"></div>
+    </div>
+    <div class="menu-buttons">
+      <button id="btn-play" class="btn big"><span id="play-label" data-i18n="play"></span></button>
+      <button id="btn-new" class="btn small grey hidden" data-i18n="newGame"></button>
+    </div>
+    <div class="menu-foot">
+      <button class="btn small blue btn-lang" data-i18n="langBtn"></button>
+      <div class="credit">Fan-made · non-commercial</div>
+    </div>
+  </div>
+
+  <div id="screen-intro" class="screen dim hidden">
+    <div class="card">
+      <p class="intro-text" data-i18n="intro"></p>
+      <p data-i18n="intro2"></p>
+      <p class="ctrl-text touch-only" data-i18n="ctrlTouch"></p>
+      <p class="ctrl-text mouse-only" data-i18n="ctrlDesk"></p>
+      <button id="btn-intro-go" class="btn">▶</button>
+    </div>
+  </div>
+
+  <div id="screen-council" class="screen dim hidden">
+    <div class="panel">
+      <div class="panel-head">
+        <h2 id="c-title" class="ink"></h2>
+        <div id="c-res"></div>
+      </div>
+      <div class="tabs">
+        <button class="tab" data-tab="gladers" data-i18n="tabGladers"></button>
+        <button class="tab" data-tab="build" data-i18n="tabBuild"></button>
+        <button class="tab" data-tab="runner" data-i18n="tabRunner"></button>
+      </div>
+      <div id="c-body" class="panel-body"></div>
+      <div class="panel-foot">
+        <div id="c-code"></div>
+        <button id="c-go" class="btn"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-pause" class="screen dim hidden">
+    <div class="card">
+      <h2 class="ink" data-i18n="paused"></h2>
+      <p class="ctrl-text touch-only" data-i18n="ctrlTouch"></p>
+      <p class="ctrl-text mouse-only" data-i18n="ctrlDesk"></p>
+      <button id="btn-resume" class="btn" data-i18n="resume"></button>
+      <div class="row">
+        <button id="btn-music" class="btn small blue toggle"></button>
+        <button id="btn-sound" class="btn small blue toggle"></button>
+      </div>
+      <div class="row">
+        <button class="btn small blue btn-lang" data-i18n="langBtn"></button>
+        <button id="btn-menu" class="btn small grey" data-i18n="menu"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-result" class="screen dim hidden">
+    <div class="card">
+      <h2 id="end-title" class="ink"></h2>
+      <p id="end-sub"></p>
+      <div id="end-stats"></div>
+      <button id="btn-end" class="btn"></button>
+    </div>
+  </div>
+
+  <div id="screen-map" class="screen dim hidden">
+    <h3 class="ink" data-i18n="mapTitle"></h3>
+    <canvas id="bigmap"></canvas>
+    <p class="ink small-hint" data-i18n="tapClose"></p>
+  </div>
+
+  <div id="hold" class="hidden"><div class="ink" data-i18n="enterCode"></div><div class="bar"><i></i></div></div>
+  <div id="fps" class="hidden"></div>
+  <div id="flash"></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

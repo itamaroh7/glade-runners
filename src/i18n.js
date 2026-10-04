@@ -1,0 +1,172 @@
+const STR = {
+  en: {
+    title1: 'GLADE', title2: 'RUNNERS',
+    tagline: 'Run the maze. Map it. Make it back before the doors close.',
+    play: 'PLAY', continueDay: 'CONTINUE · DAY {n}', newGame: 'NEW GAME', confirmNew: 'Start over? Your Glade will be lost.',
+    langBtn: 'עברית',
+    day: 'DAY {n}',
+    doorsOpen: 'THE DOORS ARE OPEN!',
+    doorsWarn: 'DOORS CLOSE IN {s}s!',
+    doorsClosing: 'THE DOORS ARE CLOSING!',
+    backHome: 'SAFE IN THE GLADE',
+    paused: 'PAUSED', resume: 'RESUME', menu: 'MENU', music: 'Music', sound: 'Sound',
+    intro: 'You wake up in a rising metal box. The only thing you remember is your name: THEO.',
+    intro2: 'Every morning the great doors open. Run the maze, bring back supplies, and find the pieces of the code that leads out. Be back before the doors close — nobody survives a night out there.',
+    ctrlTouch: 'Left thumb: run  •  Right thumb: aim & attack (tap = auto-aim)  •  Yellow button: SUPER',
+    ctrlDesk: 'WASD: run  •  Mouse: aim  •  Click: attack  •  Space/E: SUPER  •  M: map  •  Esc: pause',
+    tapClose: 'Tap anywhere to close',
+    mapTitle: 'MAZE MAP',
+    shifted: 'The walls moved during the night...',
+    food: 'Food', wood: 'Wood', metal: 'Scrap',
+    // council
+    morning: 'MORNING · DAY {n}', finalMorning: 'THE FINAL DAY',
+    tabGladers: 'GLADERS', tabBuild: 'BUILD', tabRunner: 'RUNNER',
+    openDoors: 'OPEN THE DOORS!',
+    idle: 'Unassigned', bedsLbl: 'Beds {a}/{b}',
+    tomorrow: 'Tonight: +{p} food grown, −{e} eaten',
+    hungryNow: 'The Glade is hungry! Everyone works at half strength.',
+    foodWarn: 'Not enough food for tonight! Assign farmers or bring food back.',
+    code: 'THE CODE',
+    farmer: 'Farmer', farmerD: '+3 food each night (needs a field spot)',
+    woodcutter: 'Woodcutter', woodcutterD: '+2 wood each night',
+    smith: 'Smith', smithD: '+1 scrap each night (needs the Forge)',
+    medic: 'Med-jack', medicD: '+10% runner health · one rescue a day',
+    guard: 'Guard', guardD: 'Defends the Glade when it matters',
+    fields: 'Fields', fieldsE: '{n} farmer spots',
+    homestead: 'Homestead', homesteadE: '{n} beds — the Box only sends gladers if there is room',
+    tower: 'Watchtower', tower1: 'Map more of the maze as you run', tower2: 'Shows crates and the code piece on the map',
+    forge: 'Forge', forge1: '+20% damage · unlocks Smiths', forge2: 'Reload 20% faster', forge3: '+1 ammo',
+    buildBtn: 'BUILD', maxed: 'MAX', lvl: 'Lv {n}', locked: 'LOCKED', selected: 'SELECTED', choose: 'CHOOSE',
+    unlockDay: 'Unlocks on day {n}', unlockKills: 'Defeat a Grinder', unlockFrag: 'Find {n} code pieces',
+    hp: 'Health', atk: 'Attack', sup: 'Super',
+    // runners
+    theoR: 'Balanced runner', theoA: 'Spear throw', theoS: 'Dash — burst forward, hitting everything',
+    minjaeR: 'Keeper of the Runners', minjaeA: 'Machete slash', minjaeS: 'Whirlwind — spin through enemies',
+    nateR: 'Support', nateA: 'Stone volley', nateS: 'Patch & Net — heal, then pin Grinders down',
+    garrickR: 'Tank', garrickA: 'Club smash', garrickS: 'Ground slam — stun everything nearby',
+    tessaR: 'Scout', tessaA: 'Twin darts', tessaS: 'Recall — reveal the maze and see Grinders through walls',
+    // evening
+    evening: 'EVENING · DAY {n}', cont: 'CONTINUE',
+    rLost: 'You lost everything you found today.',
+    rNight: 'Legend! +{m} scrap for surviving the night',
+    rFarm: 'Farmers grew {n} food', rWood: 'Woodcutters chopped {n} wood', rSmith: 'Smiths salvaged {n} scrap',
+    rSupplies: 'The Box brought supplies (+5 food, +3 wood)',
+    rAte: 'The Glade ate {n} food', rHungry: 'Not enough food — the Glade goes hungry!',
+    rNewGlader: '{name} arrived in the Box!', rNoBeds: 'The Box stayed empty — no free beds',
+    rUnlocked: '{name} can now run with you!', rCodeDone: 'The code is complete...',
+    rTaken: '{name} was taken by the Grinders',
+    // outcomes
+    daySurvived: 'DAY {n} SURVIVED!',
+    trapped: 'TRAPPED IN THE MAZE!', survive: 'SURVIVE UNTIL DAWN!',
+    nightWin: 'YOU SURVIVED A NIGHT IN THE MAZE!',
+    fallen: 'YOU FELL IN THE MAZE', fallenSub: 'The gladers found you at dawn and carried you home.',
+    rescued: 'A MED-JACK KIT SAVED YOU!',
+    found: 'Found today', mapped: 'Maze mapped', kills: 'Grinders',
+    // in-run
+    superReady: 'SUPER READY!', spotted: 'SPOTTED!', codePiece: 'CODE PIECE: {w}  ({n}/6)',
+    hintCrates: 'Break crates for supplies', hintGrinders: 'Grinders hunt in the maze. Keep moving!',
+    hintCode: 'Follow the light beam to today\'s code piece!', hintBack: 'Head back to the Glade!',
+    hintSuper: 'Your SUPER is charged — use it!',
+    // final
+    doorsStayOpen: 'THE DOORS... ARE NOT CLOSING!', defend: 'DEFEND THE GLADE!',
+    toHole: 'THE CODE OPENS THE GRINDER HOLE — RUN!', enterCode: 'ENTERING THE CODE... HOLD ON!',
+    victory: 'YOU ESCAPED THE MAZE!', victorySub: 'After {n} days, the Gladers are finally free.',
+    playAgain: 'PLAY AGAIN', theEnd: 'THE END... FOR NOW',
+    days: 'Days', crates: 'Crates', saved: 'Gladers',
+  },
+  he: {
+    title1: 'רצי', title2: 'הגלייד',
+    tagline: 'לרוץ במבוך. למפות אותו. לחזור לפני שהדלתות נסגרות.',
+    play: 'שחק', continueDay: 'המשך · יום {n}', newGame: 'משחק חדש', confirmNew: 'להתחיל מההתחלה? הגלייד שלך יימחק.',
+    langBtn: 'English',
+    day: 'יום {n}',
+    doorsOpen: 'הדלתות נפתחו!',
+    doorsWarn: 'הדלתות נסגרות בעוד {s} שניות!',
+    doorsClosing: 'הדלתות נסגרות!',
+    backHome: 'בטוחים בגלייד',
+    paused: 'הפסקה', resume: 'המשך', menu: 'תפריט', music: 'מוזיקה', sound: 'צלילים',
+    intro: 'התעוררת בתוך קופסת מתכת שעולה למעלה. הדבר היחיד שנשאר בזיכרון: השם שלך — תיאו.',
+    intro2: 'כל בוקר הדלתות הענקיות נפתחות. רצים במבוך, מביאים אספקה ומחפשים את חלקי הקוד שמוביל החוצה. חייבים לחזור לפני שהדלתות נסגרות — אף אחד לא שורד לילה שם בחוץ.',
+    ctrlTouch: 'אגודל שמאל: ריצה  •  אגודל ימין: כיוון ותקיפה (נגיעה = אוטומטי)  •  כפתור צהוב: סופר',
+    ctrlDesk: 'WASD: ריצה  •  עכבר: כיוון  •  קליק: תקיפה  •  רווח/E: סופר  •  M: מפה  •  Esc: הפסקה',
+    tapClose: 'נגיעה בכל מקום לסגירה',
+    mapTitle: 'מפת המבוך',
+    shifted: 'הקירות זזו במהלך הלילה...',
+    food: 'אוכל', wood: 'עץ', metal: 'גרוטאות',
+    morning: 'בוקר · יום {n}', finalMorning: 'היום האחרון',
+    tabGladers: 'גליידרים', tabBuild: 'בנייה', tabRunner: 'רץ',
+    openDoors: 'לפתוח את הדלתות!',
+    idle: 'בלי תפקיד', bedsLbl: 'מיטות {a}/{b}',
+    tomorrow: 'הלילה: +{p} אוכל יגדל, −{e} ייאכל',
+    hungryNow: 'הגלייד רעב! כולם עובדים בחצי כוח.',
+    foodWarn: 'אין מספיק אוכל להלילה! צריך עוד חקלאים או להביא אוכל מהמבוך.',
+    code: 'הקוד',
+    farmer: 'חקלאי', farmerD: '+3 אוכל כל לילה (צריך מקום בשדה)',
+    woodcutter: 'חוטב עצים', woodcutterD: '+2 עץ כל לילה',
+    smith: 'נפח', smithD: '+1 גרוטאות כל לילה (צריך נפחייה)',
+    medic: 'חובש', medicD: '+10% חיים לרץ · חילוץ אחד ביום',
+    guard: 'שומר', guardD: 'מגן על הגלייד כשזה חשוב',
+    fields: 'שדות', fieldsE: '{n} מקומות לחקלאים',
+    homestead: 'בית', homesteadE: '{n} מיטות — הקופסה שולחת גליידרים רק אם יש מקום',
+    tower: 'מגדל תצפית', tower1: 'ממפים יותר מהמבוך בזמן ריצה', tower2: 'מציג ארגזים וחלק הקוד על המפה',
+    forge: 'נפחייה', forge1: '+20% נזק · פותח נפחים', forge2: 'טעינה מהירה ב-20%', forge3: '+1 תחמושת',
+    buildBtn: 'לבנות', maxed: 'מקסימום', lvl: 'רמה {n}', locked: 'נעול', selected: 'נבחר', choose: 'לבחור',
+    unlockDay: 'נפתח ביום {n}', unlockKills: 'להביס גריינדר', unlockFrag: 'למצוא {n} חלקי קוד',
+    hp: 'חיים', atk: 'התקפה', sup: 'סופר',
+    theoR: 'רץ מאוזן', theoA: 'זריקת חנית', theoS: 'זינוק — מסתער קדימה ופוגע בכל מה שבדרך',
+    minjaeR: 'ראש הרצים', minjaeA: 'הצלפת מצ׳טה', minjaeS: 'סופת להבים — מסתובב דרך האויבים',
+    nateR: 'תומך', nateA: 'מטח אבנים', nateS: 'חבישה ורשת — מרפא ואז משתק גריינדרים',
+    garrickR: 'טנק', garrickA: 'מכת אלה', garrickS: 'הלם אדמה — משתק את כל מי שקרוב',
+    tessaR: 'סיירת', tessaA: 'חיצים כפולים', tessaS: 'זיכרון — חושפת את המבוך ורואה גריינדרים דרך קירות',
+    evening: 'ערב · יום {n}', cont: 'המשך',
+    rLost: 'איבדת את כל מה שמצאת היום.',
+    rNight: 'אגדה! +{m} גרוטאות על שרידת הלילה',
+    rFarm: 'החקלאים גידלו {n} אוכל', rWood: 'החוטבים כרתו {n} עץ', rSmith: 'הנפחים מיחזרו {n} גרוטאות',
+    rSupplies: 'הקופסה הביאה אספקה (+5 אוכל, +3 עץ)',
+    rAte: 'הגלייד אכל {n} אוכל', rHungry: 'אין מספיק אוכל — הגלייד רעב!',
+    rNewGlader: '{name} הגיע בקופסה!', rNoBeds: 'הקופסה הגיעה ריקה — אין מיטות פנויות',
+    rUnlocked: '{name} יכול לרוץ איתך עכשיו!', rCodeDone: 'הקוד הושלם...',
+    rTaken: 'הגריינדרים לקחו את {name}',
+    daySurvived: 'שרדת את יום {n}!',
+    trapped: 'נלכדת במבוך!', survive: 'לשרוד עד הזריחה!',
+    nightWin: 'שרדת לילה שלם במבוך!',
+    fallen: 'נפלת במבוך', fallenSub: 'הגליידרים מצאו אותך עם שחר וסחבו אותך הביתה.',
+    rescued: 'ערכת החובש הצילה אותך!',
+    found: 'נאסף היום', mapped: 'מופה מהמבוך', kills: 'גריינדרים',
+    superReady: 'סופר מוכן!', spotted: 'נחשפת!', codePiece: 'חלק קוד: {w}  ({n}/6)',
+    hintCrates: 'שוברים ארגזים בשביל אספקה', hintGrinders: 'גריינדרים צדים במבוך. לא לעצור!',
+    hintCode: 'הולכים אחרי קרן האור אל חלק הקוד של היום!', hintBack: 'לחזור לגלייד!',
+    hintSuper: 'הסופר טעון — להשתמש בו!',
+    doorsStayOpen: 'הדלתות... לא נסגרות!', defend: 'להגן על הגלייד!',
+    toHole: 'הקוד פותח את חור הגריינדרים — לרוץ!', enterCode: 'מקלידים את הקוד... להחזיק מעמד!',
+    victory: 'ברחתם מהמבוך!', victorySub: 'אחרי {n} ימים, הגליידרים סוף סוף חופשיים.',
+    playAgain: 'לשחק שוב', theEnd: 'הסוף... בינתיים',
+    days: 'ימים', crates: 'ארגזים', saved: 'גליידרים',
+  },
+};
+
+let lang = 'en';
+try { lang = localStorage.getItem('gr.lang') || (navigator.language?.startsWith('he') ? 'he' : 'en'); } catch {}
+
+export function getLang() { return lang; }
+
+export function setLang(l) {
+  lang = l;
+  try { localStorage.setItem('gr.lang', l); } catch {}
+  apply();
+}
+
+export function t(key, vars = {}) {
+  let s = STR[lang][key] ?? STR.en[key] ?? key;
+  for (const [k, v] of Object.entries(vars)) s = s.replaceAll('{' + k + '}', v);
+  return s;
+}
+
+/** Pick the current language from an { en, he } object. */
+export const tn = (o) => (o ? o[lang] ?? o.en : '');
+
+export function apply() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+}
